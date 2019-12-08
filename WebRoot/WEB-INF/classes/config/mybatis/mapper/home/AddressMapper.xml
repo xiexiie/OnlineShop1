@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xieyunjie.programmer.dao.home.AddressDao">
+	<!-- 收货地址插入操作 -->
+	<insert id="add" parameterType="com.xieyunjie.programmer.entity.home.Address">
+		insert into address(id,userId,name,phone,address,createTime) values(null,#{userId},#{name},#{phone},#{address},#{createTime})
+	</insert>
+	<!-- 收货地址更新操作 -->
+	<update id="edit" parameterType="com.xieyunjie.programmer.entity.home.Address">
+		update address set name = #{name},phone = #{phone},address = #{address} where id = #{id} and userId = #{userId}
+	</update>
+	<!-- 收货地址信息搜索查询 -->
+	<select id="findList" parameterType="Map" resultType="com.xieyunjie.programmer.entity.home.Address">
+		select * from address where 1 = 1 
+		<if test="userId != null">
+			and userId = #{userId}  
+		</if>
+		<if test="offset != null and pageSize != null">
+			limit #{offset},#{pageSize}
+		</if>
+	</select>
+	<!-- 模糊搜索总条数 -->
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from address where 1 = 1 
+		<if test="userId != null">
+			and userId = #{userId}  
+		</if>
+	</select>
+	<!-- 根据id查询 -->
+	<select id="findById" parameterType="Long" resultType="com.xieyunjie.programmer.entity.home.Address">
+		select * from address where id = #{value}
+	</select>
+	<!-- 删除收货地址信息 -->
+	<delete id="delete" parameterType="String">
+		delete from address where id in(${value})
+	</delete>
+</mapper>

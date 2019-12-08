@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xieyunjie.programmer.dao.common.ProductDao">
+	<!-- 商品插入操作 -->
+	<insert id="add" parameterType="com.xieyunjie.programmer.entity.common.Product">
+		insert into product(id,productCategoryId,name,tags,imageUrl,price,stock,sellNum,viewNum,commentNum,content,createTime) values(null,#{productCategoryId},#{name},#{tags},#{imageUrl},#{price},#{stock},#{sellNum},#{viewNum},#{commentNum},#{content},#{createTime})
+	</insert>
+	<!-- 商品更新操作 -->
+	<update id="edit" parameterType="com.xieyunjie.programmer.entity.common.Product">
+		update product set productCategoryId = #{productCategoryId},name = #{name},tags = #{tags},imageUrl = #{imageUrl},price = #{price},stock = #{stock},content = #{content} where id = #{id}
+	</update>
+	<!-- 商品统计数量更新 -->
+	<update id="updateNum" parameterType="com.xieyunjie.programmer.entity.common.Product">
+		update product set stock = #{stock},sellNum = #{sellNum},viewNum = #{viewNum},commentNum = #{commentNum} where id = #{id}
+	</update>
+	<!-- 商品信息搜索查询 -->
+	<select id="findList" parameterType="Map" resultType="com.xieyunjie.programmer.entity.common.Product">
+		select * from product where 1 = 1 
+		<if test="name != null">
+			and name like '%${name}%' 
+		</if>
+		<if test="tags != null">
+			and tags like '%${tags}%'  
+		</if>
+		<if test="priceMin != null">
+			and price &gt; #{priceMin}  
+		</if>
+		<if test="priceMax != null">
+			and price &lt; #{priceMax}  
+		</if>
+		<if test="orderBy != null and sort != null">
+			order by ${orderBy} ${sort}   
+		</if>
+		<if test="offset != null and pageSize != null">
+			limit #{offset},#{pageSize}
+		</if>
+	</select>
+	<!-- 模糊搜索总条数 -->
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from product where 1 = 1 
+		<if test="name != null">
+			and name like '%${name}%' 
+		</if>
+		<if test="tags != null">
+			and tags in(${tags})  
+		</if>
+		<if test="priceMin != null">
+			and price &gt; #{priceMin}  
+		</if>
+		<if test="priceMax != null">
+			and price &lt; #{priceMax}  
+		</if>
+	</select>
+	<!-- 根据id查询 -->
+	<select id="findById" parameterType="Long" resultType="com.xieyunjie.programmer.entity.common.Product">
+		select * from product where id = #{value}
+	</select>
+	<!-- 删除商品信息 -->
+	<delete id="delete" parameterType="String">
+		delete from product where id in(${value})
+	</delete>
+</mapper>

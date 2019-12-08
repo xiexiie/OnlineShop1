@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 映射文件 -->
+<mapper namespace="com.xieyunjie.programmer.dao.common.CommentDao">
+	<resultMap id="commentResultMap" type="com.xieyunjie.programmer.entity.common.Comment">
+		<id column="c_id" property="id" />
+		<result column="c_productId" property="productId" />
+		<result column="c_userId" property="userId" />
+		<result column="c_type" property="type" />
+		<result column="c_content" property="content" />
+		<result column="c_createTime" property="createTime" />
+		<association property="product" javaType="com.xieyunjie.programmer.entity.common.Product">
+			<id column="p_id" property="id" />
+			<result column="p_name" property="name" />
+			<result column="p_imageUrl" property="imageUrl" />
+			<result column="p_price" property="price" />
+		</association>
+		<association property="account" javaType="com.xieyunjie.programmer.entity.common.Account">
+			<id column="a_id" property="id" />
+			<result column="a_name" property="name" />
+		</association>
+	</resultMap>
+	
+	
+	<!-- 评论插入操作 -->
+	<insert id="add" parameterType="com.xieyunjie.programmer.entity.common.Comment">
+		insert into comment(id,productId,userId,type,content,createTime) values(null,#{productId},#{userId},#{type},#{content},#{createTime})
+	</insert>
+	<!-- 评论更新操作 -->
+	<update id="edit" parameterType="com.xieyunjie.programmer.entity.common.Comment">
+		update comment set type = #{type},content = #{content} where id = #{id}
+	</update>
+	<!-- 评论信息搜索查询 -->
+	<select id="findList" parameterType="Map" resultMap="commentResultMap">
+		select 
+			c.id as c_id,c.productId as c_productId,c.userId as c_userId,c.type as c_type,c.content as c_content,c.createTime as c_createTime,
+			p.id as p_id,p.name as p_name,p.imageUrl as p_imageUrl,p.price as p_price,
+			a.id as a_id,a.name as a_name
+		from comment c,product p,account a where c.productId = p.id and c.userId = a.id  
+		<if test="productName != null">
+			and p.name like '%${productName}%'  
+		</if>
+		<if test="productId != null">
+			and p.id = #{productId}   
+		</if>
+		<if test="username != null">
+			and a.name like '%${username}%'  
+		</if>
+		<if test="userId != null">
+			and c.userId = #{userId}   
+		</if>
+		<if test="type != null">
+			and c.type = #{type}  
+		</if>
+		<if test="orderBy != null and sort != null">
+			order by ${orderBy} ${sort}   
+		</if>
+		<if test="offset != null and pageSize != null">
+			limit #{offset},#{pageSize}
+		</if>
+	</select>
+	<!-- 模糊搜索总条数 -->
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from comment c,product p,account a where c.productId = p.id and c.userId = a.id  
+		<if test="productName != null">
+			and p.name like '%${productId}%'  
+		</if>
+		<if test="username != null">
+			and a.name like '%${username}%'  
+		</if>
+		<if test="type != null">
+			and c.type = #{type}  
+		</if>
+	</select>
+	<!-- 根据id查询 -->
+	<select id="findById" parameterType="Long" resultType="com.xieyunjie.programmer.entity.common.Comment">
+		select * from comment where id = #{value}
+	</select>
+	<!-- 删除评论信息 -->
+	<delete id="delete" parameterType="String">
+		delete from comment where id in(${value})
+	</delete>
+</mapper>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xieyunjie.programmer.dao.common.AccountDao">
+	<!-- 客户插入操作 -->
+	<insert id="add" parameterType="com.xieyunjie.programmer.entity.common.Account">
+		insert into account(id,name,password,email,trueName,sex,status,createTime) values(null,#{name},#{password},#{email},#{trueName},#{sex},#{status},#{createTime})
+	</insert>
+	<!-- 客户更新操作 -->
+	<update id="edit" parameterType="com.xieyunjie.programmer.entity.common.Account">
+		update account set name = #{name},password = #{password},email = #{email},trueName = #{trueName},sex = #{sex},status = #{status} where id = #{id}
+	</update>
+	<!-- 客户信息搜索查询 -->
+	<select id="findList" parameterType="Map" resultType="com.xieyunjie.programmer.entity.common.Account">
+		select * from account where 1 = 1 
+		<if test="name != null">
+			and name like '%${name}%' 
+		</if>
+		<if test="sex != null">
+			and sex = #{sex}  
+		</if>
+		<if test="status != null">
+			and status = #{status}  
+		</if>
+		<if test="orderBy != null and sort != null">
+			order by ${orderBy} ${sort}   
+		</if>
+		<if test="offset != null and pageSize != null">
+			limit #{offset},#{pageSize}
+		</if>
+	</select>
+	<!-- 模糊搜索总条数 -->
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from account where 1 = 1 
+		<if test="name != null">
+			and name like '%${name}%' 
+		</if>
+		<if test="sex != null">
+			and sex = #{sex}  
+		</if>
+		<if test="status != null">
+			and status = #{status}  
+		</if>
+	</select>
+	<!-- 根据id查询 -->
+	<select id="findById" parameterType="Long" resultType="com.xieyunjie.programmer.entity.common.Account">
+		select * from account where id = #{value}
+	</select>
+	<!-- 根据用户名查询 -->
+	<select id="findByName" parameterType="String" resultType="com.xieyunjie.programmer.entity.common.Account">
+		select * from account where name = #{value}
+	</select>
+	<!-- 删除客户信息 -->
+	<delete id="delete" parameterType="String">
+		delete from account where id in(${value})
+	</delete>
+</mapper>

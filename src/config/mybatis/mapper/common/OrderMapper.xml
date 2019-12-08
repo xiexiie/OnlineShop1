@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xieyunjie.programmer.dao.common.OrderDao">
+	<!-- 订单插入操作 -->
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="com.xieyunjie.programmer.entity.common.Order">
+		insert into orders(id,sn,userId,address,money,productNum,status,remark,createTime) values(null,#{sn},#{userId},#{address},#{money},#{productNum},#{status},#{remark},#{createTime})
+	</insert>
+	<!-- 订单子项插入操作 -->
+	<insert id="addItem" parameterType="com.xieyunjie.programmer.entity.common.OrderItem">
+		insert into order_item(id,orderId,productId,name,imageUrl,price,num,money) values(null,#{orderId},#{productId},#{name},#{imageUrl},#{price},#{num},#{money})
+	</insert>
+	<!-- 订单更新操作 -->
+	<update id="edit" parameterType="com.xieyunjie.programmer.entity.common.Order">
+		update orders set address = #{address},money = #{money},status = #{status},remark = #{remark} where id = #{id}
+	</update>
+	<!-- 订单信息搜索查询 -->
+	<select id="findList" parameterType="Map" resultType="com.xieyunjie.programmer.entity.common.Order">
+		select * from orders where 1 = 1 
+		<if test="sn != null">
+			and sn like '%${sn}%' 
+		</if>
+		<if test="userId != null">
+			and userId = #{userId}   
+		</if>
+		<if test="status != null">
+			and status = #{status}   
+		</if>
+		<if test="moneyMin != null">
+			and money &gt; #{moneyMin}  
+		</if>
+		<if test="moneyMax != null">
+			and money &lt; #{moneyMax}  
+		</if>
+		<if test="orderBy != null and sort != null">
+			order by ${orderBy} ${sort}   
+		</if>
+		<if test="offset != null and pageSize != null">
+			limit #{offset},#{pageSize}
+		</if>
+	</select>
+	<!-- 模糊搜索总条数 -->
+	<select id="getTotal" parameterType="Map" resultType="Integer">
+		select count(*) from orders where 1 = 1 
+		<if test="sn != null">
+			and sn like '%${sn}%' 
+		</if>
+		<if test="userId != null">
+			and userId = #{userId}   
+		</if>
+		<if test="status != null">
+			and status = #{status}   
+		</if>
+		<if test="moneyMin != null">
+			and money &gt; #{moneyMin}  
+		</if>
+		<if test="moneyMax != null">
+			and money &lt; #{moneyMax}  
+		</if>
+	</select>
+	<!-- 根据id查询 -->
+	<select id="findById" parameterType="Long" resultType="com.xieyunjie.programmer.entity.common.Order">
+		select * from orders where id = #{value}
+	</select>
+	<!-- 根据orderId查询订单子项 -->
+	<select id="findOrderItemList" parameterType="Long" resultType="com.xieyunjie.programmer.entity.common.OrderItem">
+		select * from order_item where orderId = #{value}
+	</select>
+	<!-- 统计指定时间段内的销售额 -->
+	<select id="getStats" parameterType="Map" resultType="Map">
+		select sum(money) as money,DATE_FORMAT(createTime,"%Y%m%d") as date from orders where 1 = 1 
+		<if test="startTime != null">
+			and createTime &gt; #{startTime}    
+		</if>
+		<if test="endTime != null">
+			and createTime &lt; #{endTime}   
+		</if>
+		GROUP BY DATE_FORMAT(createTime,"%Y%m%d")
+	</select>
+	<!-- 删除订单信息 -->
+	<delete id="delete" parameterType="String">
+		delete from orders where id in(${value})
+	</delete>
+</mapper>
